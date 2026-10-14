@@ -2,12 +2,15 @@ import re
 import sys
 from pathlib import Path
 from playwright.sync_api import Page, expect, sync_playwright
-from utils import scroll_page_visibly
-# Ensure services directory is in sys.path
-SERVICES_DIR = Path(__file__).resolve().parent
-if str(SERVICES_DIR) not in sys.path:
-    sys.path.insert(0, str(SERVICES_DIR))
 
+# Ensure services directory and project root are in sys.path
+SERVICES_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SERVICES_DIR.parent
+for path in (SERVICES_DIR, PROJECT_ROOT):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
+
+from utils import scroll_page_visibly
 from config import ADMIN_USER, APP_URL
 
 
@@ -42,57 +45,9 @@ def test_admin_login(page: Page):
 
     # 6. Verify URL transition to /admin/dashboard (or /admin/home if redirected by the app)
     expect(page).to_have_url(re.compile(r"/admin/(dashboard|home)"), timeout=10000)
+    page.wait_for_timeout(4000)
+    page.screenshot(path="result/admin/dashboard/dash_0.png")
     scroll_page_visibly(page, role="admin")
-
-
-# def scroll_page_visibly(page):
-    """Scroll slowly from top to bottom, then back to top."""
-
-    print("Starting visible scroll automation...")
-
-    # Start at the top
-    page.evaluate("window.scrollTo(0, 0)")
-    page.wait_for_timeout(1000)
-
-    # Scroll down gradually
-    while True:
-        previous_position = page.evaluate("window.scrollY")
-        page.mouse.wheel(0, 300)
-        page.wait_for_timeout(500)
-
-        current_position = page.evaluate("window.scrollY")
-        scroll_height = page.evaluate(
-            "() => document.documentElement.scrollHeight"
-        )
-        viewport_height = page.evaluate(
-            "() => window.innerHeight"
-        )
-
-        print(f"Scrolling down: {current_position}px")
-
-        # Stop when the bottom is reached
-        if current_position + viewport_height >= scroll_height - 5:
-            break
-
-        # Prevent an infinite loop if the page cannot scroll
-        if current_position == previous_position:
-            break
-
-    print("Reached the bottom. Scrolling back to the top...")
-
-    # Scroll up gradually
-    while True:
-        previous_position = page.evaluate("window.scrollY")
-        page.mouse.wheel(0, -300)
-        page.wait_for_timeout(500)
-
-        current_position = page.evaluate("window.scrollY")
-        print(f"Scrolling up: {current_position}px")
-
-        if current_position <= 0 or current_position == previous_position:
-            break
-
-    print("Scrolling automation completed.")
 
 
 if __name__ == "__main__":

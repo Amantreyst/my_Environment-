@@ -6,9 +6,15 @@ ADMIN_USER = {
 }
 
 TEST_INVESTOR = {
-    "email": "test_inv1@gmail.com",
-    "password": "test@ive1",
+    "email": "test_investor1@gmail.com",
+    "password": "test@inv1",
 }
+
+TEST_INVESTOR_2 = {
+    "email": "test_investor2@gmail.com",
+    "password": "test@inv2",
+}
+
 
 TEST_ORIGINATOR_2 = {
     "email": "test_ori2@gmail.com",

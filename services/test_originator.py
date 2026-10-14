@@ -46,7 +46,8 @@ def test_originator_login(page: Page):
 
     # 6. Verify URL transition to /originator/dashboard (or /originator/home if redirected by the app)
     expect(page).to_have_url(re.compile(r"/originator/(dashboard|home)"), timeout=10000)
-   
+    page.wait_for_timeout(3000)
+    page.screenshot(path="result/originator/dashboard/dash_0.png")
     scroll_page_visibly(page, role="originator")
 
 
